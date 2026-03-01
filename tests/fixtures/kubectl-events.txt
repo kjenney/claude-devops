@@ -1,0 +1,4 @@
+LAST SEEN   TYPE      REASON      OBJECT                            MESSAGE
+5m          Warning   BackOff     pod/my-service-7d9f8b6c4-def34    Back-off restarting failed container
+10m         Normal    Pulled      pod/my-service-7d9f8b6c4-def34    Successfully pulled image
+12m         Warning   OOMKilling  pod/my-service-7d9f8b6c4-def34    Memory limit reached

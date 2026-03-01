@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Mock AWS CLI for testing
+# Returns fixture data based on subcommand arguments
+
+FIXTURE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../fixtures" && pwd)"
+
+# Join all args to match on
+ARGS="$*"
+
+case "$ARGS" in
+  "sts get-caller-identity"*)
+    echo '{"UserId":"AIDA123","Account":"123456789012","Arn":"arn:aws:iam::123456789012:user/test"}'
+    ;;
+  "configure list-profiles"*)
+    printf "prod\nstaging\ndev\n"
+    ;;
+  "rds describe-db-instances"*)
+    # Support --query filtering by returning full JSON (scripts use --query)
+    cat "$FIXTURE_DIR/rds-describe-instances.json"
+    ;;
+  "rds describe-events"*)
+    cat "$FIXTURE_DIR/rds-events.json"
+    ;;
+  "cloudwatch get-metric-statistics"*)
+    cat "$FIXTURE_DIR/cloudwatch-datapoints.json"
+    ;;
+  "lambda get-function"*)
+    cat "$FIXTURE_DIR/lambda-function.json"
+    ;;
+  "lambda get-function-concurrency"*)
+    echo '{"ReservedConcurrentExecutions": 100}'
+    ;;
+  "logs filter-log-events"*)
+    cat "$FIXTURE_DIR/logs-filter-events.json"
+    ;;
+  "logs describe-log-groups"*)
+    echo '{"logGroups": [{"logGroupName": "/aws/lambda/payment-processor"}]}'
+    ;;
+  "cloudwatch describe-alarms"*)
+    echo '{"MetricAlarms": []}'
+    ;;
+  *)
+    # Default: return empty success response
+    echo '{}'
+    ;;
+esac

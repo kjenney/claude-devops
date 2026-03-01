@@ -1,0 +1,4 @@
+NAME                              READY   STATUS    RESTARTS   AGE   IP           NODE
+my-service-7d9f8b6c4-abc12        1/1     Running   0          2d    10.0.1.5     ip-10-0-1-1
+my-service-7d9f8b6c4-def34        0/1     CrashLoopBackOff   5   1h    10.0.1.6     ip-10-0-1-2
+my-service-7d9f8b6c4-ghi56        1/1     Running   0          2d    10.0.1.7     ip-10-0-1-3

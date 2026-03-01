@@ -1,0 +1,12 @@
+{
+  "events": [
+    {
+      "timestamp": 1705316400000,
+      "message": "[ERROR] Task timed out after 30.02 seconds"
+    },
+    {
+      "timestamp": 1705316100000,
+      "message": "[ERROR] ConnectionError: Failed to connect to database"
+    }
+  ]
+}

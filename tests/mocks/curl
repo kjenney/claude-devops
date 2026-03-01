@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+# Mock curl for testing Datadog API calls
+# Detects the URL path and returns appropriate fixture data
+
+ARGS="$*"
+
+# Extract URL from arguments (it's the last non-flag arg or after -X METHOD)
+URL=""
+for arg in "$@"; do
+  case "$arg" in
+    https://*)
+      URL="$arg"
+      ;;
+  esac
+done
+
+case "$URL" in
+  */api/v2/logs/events/search*)
+    cat <<'EOF'
+{
+  "data": [
+    {
+      "id": "AQAAAYbXMjKdBIb1SAAAAA",
+      "attributes": {
+        "timestamp": "2024-01-15T10:30:00Z",
+        "status": "error",
+        "message": "ERROR: Failed to process payment: connection timeout",
+        "service": "payment-api",
+        "tags": ["env:prod", "service:payment-api"]
+      }
+    },
+    {
+      "id": "AQAAAYbXMjKdBIb1SBBBBB",
+      "attributes": {
+        "timestamp": "2024-01-15T10:28:00Z",
+        "status": "error",
+        "message": "ERROR: Database connection pool exhausted",
+        "service": "payment-api",
+        "tags": ["env:prod", "service:payment-api"]
+      }
+    }
+  ],
+  "meta": {"page": {"after": null}}
+}
+EOF
+    ;;
+  */api/v2/logs/analytics/aggregate*)
+    cat <<'EOF'
+{
+  "data": {
+    "buckets": [
+      {"by": {"status": "error"}, "computes": {"c0": 47}},
+      {"by": {"status": "info"}, "computes": {"c0": 1203}},
+      {"by": {"status": "warn"}, "computes": {"c0": 12}}
+    ]
+  }
+}
+EOF
+    ;;
+  */api/v1/monitor/search*)
+    cat <<'EOF'
+{
+  "monitors": [
+    {"id": 12345, "name": "payment-api error rate > 5%", "status": "Alert"},
+    {"id": 12346, "name": "payment-api p95 latency", "status": "OK"}
+  ],
+  "metadata": {"total_count": 2}
+}
+EOF
+    ;;
+  */api/v1/query*)
+    cat <<'EOF'
+{
+  "series": [
+    {
+      "metric": "trace.web.request.duration",
+      "pointlist": [
+        [1705312800000, 245.3],
+        [1705313100000, 312.7],
+        [1705313400000, 891.2]
+      ]
+    }
+  ]
+}
+EOF
+    ;;
+  *)
+    echo '{"status": "ok"}'
+    ;;
+esac

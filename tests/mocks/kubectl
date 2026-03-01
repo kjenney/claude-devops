@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# Mock kubectl for testing
+
+FIXTURE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../fixtures" && pwd)"
+
+ARGS="$*"
+
+case "$ARGS" in
+  "cluster-info"*)
+    echo "Kubernetes control plane is running at https://ABC123.gr7.us-east-1.eks.amazonaws.com"
+    echo "CoreDNS is running at https://ABC123.gr7.us-east-1.eks.amazonaws.com/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy"
+    ;;
+  "config use-context"*)
+    echo "Switched to context \"${*##* }\"."
+    ;;
+  "config current-context"*)
+    echo "prod-cluster"
+    ;;
+  "config get-contexts"*)
+    printf "CURRENT   NAME           CLUSTER        AUTHINFO       NAMESPACE\n"
+    printf "*         prod-cluster   prod-cluster   prod-user      default\n"
+    printf "          staging        staging        staging-user   default\n"
+    ;;
+  "get nodes"*)
+    printf "NAME           STATUS   ROLES    AGE   VERSION\n"
+    printf "ip-10-0-1-1    Ready    <none>   30d   v1.28.0\n"
+    printf "ip-10-0-1-2    Ready    <none>   30d   v1.28.0\n"
+    ;;
+  "get pods"*)
+    cat "$FIXTURE_DIR/kubectl-get-pods.txt"
+    ;;
+  "get events"*)
+    cat "$FIXTURE_DIR/kubectl-events.txt"
+    ;;
+  "get deployment"* | "rollout status"*)
+    printf "NAME         READY   UP-TO-DATE   AVAILABLE   AGE\n"
+    printf "my-service   2/3     3            2           2d\n"
+    ;;
+  "rollout history"*)
+    printf "REVISION  CHANGE-CAUSE\n1         <none>\n2         <none>\n"
+    ;;
+  "describe deployment"*)
+    printf "Name:           my-service\nNamespace:      production\nReplicas:       3 desired | 3 updated | 3 total | 2 available | 1 unavailable\n\nEvents:\n  Warning  ReplicaSetUpdated  5m  Some pods are not ready\n"
+    ;;
+  "describe pod"*)
+    printf "Name:         my-service-7d9f8b6c4-def34\nStatus:       Running\nContainers:\n  my-service:\n    Last State: OOMKilled\n    Exit Code:  137\n"
+    ;;
+  "logs"*)
+    printf "[2024-01-15 10:30:00] ERROR: Out of memory\n[2024-01-15 10:29:55] ERROR: Heap allocation failed\n"
+    ;;
+  "top pods"*)
+    printf "NAME                              CPU(cores)   MEMORY(bytes)\n"
+    printf "my-service-7d9f8b6c4-abc12        10m          450Mi\n"
+    printf "my-service-7d9f8b6c4-ghi56        12m          460Mi\n"
+    ;;
+  "get svc"*)
+    printf "NAME         TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE\n"
+    printf "my-service   ClusterIP   10.100.50.25   <none>        8080/TCP   30d\n"
+    ;;
+  "describe svc"*)
+    printf "Name:     my-service\nSelector: app=my-service\nPort:     8080/TCP\nEndpoints: 10.0.1.5:8080,10.0.1.7:8080\n"
+    ;;
+  "get endpoints"*)
+    printf "NAME         ENDPOINTS                           AGE\n"
+    printf "my-service   10.0.1.5:8080,10.0.1.7:8080        30d\n"
+    ;;
+  "get networkpolicies"*)
+    printf "No resources found in production namespace.\n"
+    ;;
+  "run dns-test"*)
+    printf "Server:    10.100.0.10\nAddress 1: 10.100.0.10 kube-dns.kube-system.svc.cluster.local\nName:      my-service.production.svc.cluster.local\nAddress 1: 10.100.50.25 my-service.production.svc.cluster.local\n"
+    ;;
+  *)
+    echo ""
+    ;;
+esac

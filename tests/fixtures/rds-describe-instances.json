@@ -1,0 +1,16 @@
+{
+  "DBInstances": [
+    {
+      "DBInstanceStatus": "available",
+      "Endpoint": {
+        "Address": "prod-db.abc123.us-east-1.rds.amazonaws.com",
+        "Port": 5432
+      },
+      "Engine": "postgres",
+      "DBInstanceClass": "db.t3.medium",
+      "MultiAZ": true,
+      "StorageType": "gp2",
+      "AllocatedStorage": 100
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "Datapoints": [
+    {
+      "Timestamp": "2024-01-15T10:00:00Z",
+      "Maximum": 42.0,
+      "Minimum": 8589934592.0,
+      "Average": 12.5,
+      "Sum": 0.0,
+      "Unit": "Count"
+    },
+    {
+      "Timestamp": "2024-01-15T10:05:00Z",
+      "Maximum": 45.0,
+      "Minimum": 8589934592.0,
+      "Average": 14.0,
+      "Sum": 0.0,
+      "Unit": "Count"
+    }
+  ],
+  "Label": "DatabaseConnections"
+}
