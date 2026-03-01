@@ -1,4 +1,4 @@
-# devops-plugin
+# devops-claude-plugin
 
 A Claude Code plugin for performing DevOps troubleshooting tasks, including:
 
