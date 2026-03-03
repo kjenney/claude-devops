@@ -42,7 +42,21 @@ aws configure list --profile $AWS_PROFILE
 
 Use the service-specific workflows in `references/aws-services.md` based on the resource type involved.
 
-### 4. Check CloudWatch for Signals
+### 4. Lambda-Specific Investigation
+
+For Lambda function errors, test invoke the function to identify runtime errors:
+
+```bash
+aws lambda invoke \
+  --function-name <function-name> \
+  --payload '{}' \
+  --log-type Tail \
+  response.json
+```
+
+Check the response and logs in the output.
+
+### 5. Check CloudWatch for Signals
 
 Always check CloudWatch logs and metrics as a cross-cutting concern:
 
@@ -62,7 +76,7 @@ aws cloudwatch describe-alarms \
   --query 'MetricAlarms[*].{Name:AlarmName,Reason:StateReason}'
 ```
 
-### 5. Summarize Findings
+### 6. Summarize Findings
 
 After gathering data:
 1. State what was found (errors, misconfigurations, resource states)

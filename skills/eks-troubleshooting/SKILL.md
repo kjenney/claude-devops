@@ -16,7 +16,15 @@ Ensure the following are available:
 
 ## Core Workflow
 
-### 1. Gather Context
+### 1. Update kubeconfig
+
+Always update kubeconfig before querying Kubernetes clusters:
+
+```bash
+aws eks update-kubeconfig --name <cluster-name> --region <region>
+```
+
+### 2. Gather Context
 
 Collect before running commands:
 - **What is broken**: Symptom or error message
@@ -31,7 +39,7 @@ kubectl config use-context <context-name>
 export NS=<namespace>
 ```
 
-### 2. Verify Cluster Access
+### 3. Verify Cluster Access
 
 ```bash
 kubectl cluster-info
@@ -39,11 +47,19 @@ kubectl config current-context
 kubectl get nodes -o wide
 ```
 
-### 3. Investigate by Resource Type
+### 4. Check Pod Status Across All Namespaces
+
+Always check pod status across all namespaces before troubleshooting:
+
+```bash
+kubectl get pods --all-namespaces -o wide
+```
+
+### 5. Investigate by Resource Type
 
 Use the patterns in `references/kubernetes-resources.md` based on what is broken.
 
-### 4. Systematic Pod Investigation
+### 6. Systematic Pod Investigation
 
 For any pod issue, run this sequence:
 
@@ -64,13 +80,13 @@ kubectl logs <pod-name> -n $NS --previous --tail=100
 kubectl get events -n $NS --sort-by='.lastTimestamp' | tail -30
 ```
 
-### 5. Common Pod Status Meanings
+### 7. Common Pod Status Meanings
 
 | Status | Meaning | First Action |
 |--------|---------|-------------|
 | `CrashLoopBackOff` | Container exits repeatedly | Check logs with `--previous` |
 | `OOMKilled` | Memory limit exceeded | Increase `resources.limits.memory` |
-| `ImagePullBackOff` | Cannot pull container image | Check image name, tag, registry auth |
+| `ImagePullBackOff` | Cannot pull container image | Use as signal for credential/registry issues - check image name, tag, registry credentials, and ECR access |
 | `Pending` | Cannot be scheduled | Check node capacity, taints, resource requests |
 | `Terminating` | Stuck during deletion | Check for finalizers |
 | `Error` | Container exited with error | Check exit code in `describe`, check logs |
