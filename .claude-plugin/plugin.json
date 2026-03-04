@@ -1,6 +1,6 @@
 {
-  "name": "devops-plugin",
-  "version": "0.1.1",
+  "name": "claude-devops",
+  "version": "0.1.2",
   "description": "DevOps troubleshooting plugin for AWS resources, EKS services, and Datadog logs and metrics",
   "author": {
     "name": "kjenney"
