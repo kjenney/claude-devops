@@ -1,0 +1,39 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Agent.*aws-investigator",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash skills/aws-troubleshooting/examples/investigate-lambda.sh ${FUNCTION_NAME:-my-function} 2>/dev/null | tail -20 || echo 'AWS troubleshooting script executed'",
+            "async": true,
+            "statusMessage": "Running AWS Lambda investigation script..."
+          }
+        ]
+      },
+      {
+        "matcher": "Agent.*eks-investigator",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash skills/eks-troubleshooting/examples/investigate-deployment.sh ${DEPLOYMENT:-my-deployment} 2>/dev/null | tail -20 || echo 'EKS troubleshooting script executed'",
+            "async": true,
+            "statusMessage": "Running EKS deployment investigation script..."
+          }
+        ]
+      },
+      {
+        "matcher": "Agent.*datadog-investigator",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash skills/datadog-troubleshooting/examples/investigate-service.sh 2>/dev/null | tail -20 || echo 'Datadog troubleshooting script executed'",
+            "async": true,
+            "statusMessage": "Running Datadog service investigation script..."
+          }
+        ]
+      }
+    ]
+  }
+}
