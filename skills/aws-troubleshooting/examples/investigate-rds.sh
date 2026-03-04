@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # Example: Investigate RDS connection issues
-# Usage: AWS_PROFILE=prod AWS_DEFAULT_REGION=us-east-1 bash investigate-rds.sh prod-db-instance
+#
+# AUTOMATED: This script is automatically called by run-investigation.sh when RDS/database issues are detected.
+# It can also be run directly for manual investigation.
+#
+# Usage: AWS_PROFILE=prod AWS_DEFAULT_REGION=us-east-1 bash investigate-rds.sh <db-instance-id> [time-window-minutes]
+# Example: AWS_PROFILE=prod AWS_DEFAULT_REGION=us-east-1 bash investigate-rds.sh prod-db-instance 60
 
 set -euo pipefail
 

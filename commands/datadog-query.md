@@ -9,7 +9,7 @@ allowed-tools:
 
 # Datadog Query
 
-The user wants to investigate service health using Datadog. Query the Datadog API for logs, metrics, monitors, and/or APM traces.
+The user wants to investigate service health using Datadog with automated investigation.
 
 ## Step 1: Verify Credentials
 
@@ -28,7 +28,7 @@ Ask them to set in their shell: `export DD_API_KEY=... && export DD_APP_KEY=...`
 
 Also set the Datadog site (default: `datadoghq.com`, EU customers use `datadoghq.eu`):
 ```bash
-DD_SITE="${DD_SITE:-datadoghq.com}"
+export DD_SITE="${DD_SITE:-datadoghq.com}"
 ```
 
 ## Step 2: Gather Query Parameters
@@ -38,51 +38,54 @@ Ask the user (all in one message):
 1. **Service name**: The `service` tag value in Datadog (e.g., `payment-api`, `user-service`)
 2. **Environment**: The `env` tag (e.g., `prod`, `staging`)
 3. **Time window**: How far back to look (default: last 60 minutes)
-4. **What to investigate**: Logs, metrics, monitors, APM traces, or all?
+4. **What is the problem?**: Description of the issue to investigate
 
-If the user provided an argument, use it as the service name or investigation context.
+If the user provided an argument, use it as the service name or problem description.
 
-## Step 3: Set Variables
+## Step 3: Automatic Investigation
+
+Once credentials and parameters are confirmed, run the automated investigation script which will:
+
+1. Verify Datadog API access
+2. **Automatically run** the comprehensive service investigation
+3. Query monitors, logs, errors, and APM traces
+4. Provide health summary with relevant context
 
 ```bash
-export SERVICE=<service-name>
-export ENV=<environment>
-export DD_SITE="${DD_SITE:-datadoghq.com}"
-BASE_URL="https://api.${DD_SITE}"
-
-# Calculate time window (adjust MINUTES as needed)
-MINUTES=60
-FROM=$(date -u -d "${MINUTES} minutes ago" +%s 2>/dev/null || date -u -v-${MINUTES}M +%s)
-TO=$(date -u +%s)
-FROM_ISO=$(date -u -d "${MINUTES} minutes ago" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v-${MINUTES}M +%Y-%m-%dT%H:%M:%SZ)
-TO_ISO=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-
-AUTH=(-H "DD-API-KEY: ${DD_API_KEY}" -H "DD-APPLICATION-KEY: ${DD_APP_KEY}" -H "Content-Type: application/json")
+bash skills/datadog-troubleshooting/run-investigation.sh "<problem>" "<service-name>" "<environment>" "[time-window-minutes]"
 ```
 
-## Step 4: Query Datadog
+This script automatically:
+- Checks triggered monitors for the service
+- Searches recent error logs
+- Aggregates error counts by status
+- Queries P95 latency from APM
+- Provides Datadog UI link for full context
 
-Run the appropriate queries based on the investigation type. Use the `datadog-troubleshooting` skill for detailed API call patterns.
+## Step 4: Additional Queries (If Needed)
 
-### For Log Investigation:
-- Search for error logs: `service:${SERVICE} env:${ENV} status:error`
-- Aggregate log counts by status
-- Search for specific error patterns (timeout, connection, exception)
+If you need deeper analysis beyond the automated investigation, use the `datadog-troubleshooting` skill for detailed API call patterns and custom queries.
 
-### For Metrics:
-- Query request rate, error rate, P95 latency
-- Check CPU/memory if service-level infra metrics exist
-- Use v1 metrics query API
+### For deeper Log Investigation:
+- Search for specific error patterns: `service:${SERVICE} env:${ENV} "error text"`
+- Aggregate by facets to group errors by source or type
+- Search for specific exception types or stack traces
 
-### For Monitor Status:
-- Search monitors tagged with `service:${SERVICE}`
-- Filter for monitors in Alert or No Data state
-- Show monitor name, state, and triggering query
+### For detailed Metrics:
+- Query request rate, error rate, and latency percentiles (P50, P95, P99)
+- Check infrastructure metrics if available
+- Use v1 metrics query API or Metrics API documentation
 
-### For APM Traces:
-- Search for error traces
+### For deeper Monitor Analysis:
+- Review recent monitor state changes and reasons
+- Correlate multiple firing monitors to identify root cause
+- Check composite monitor conditions
+
+### For detailed APM Traces:
+- Search for error traces filtered by service and environment
 - Query slow traces (sorted by duration descending)
-- Look for high error rates on specific endpoints/resources
+- Look for high error rates on specific endpoints or resources
+- Correlate trace IDs with log entries
 
 ## Step 5: Analyze and Report
 

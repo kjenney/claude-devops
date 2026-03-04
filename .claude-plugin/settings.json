@@ -6,9 +6,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash skills/aws-troubleshooting/examples/investigate-lambda.sh ${FUNCTION_NAME:-my-function} 2>/dev/null | tail -20 || echo 'AWS troubleshooting script executed'",
+            "command": "bash skills/aws-troubleshooting/run-investigation.sh \"${PROBLEM:-AWS issue detected}\" \"${AWS_PROFILE:-default}\" \"${AWS_DEFAULT_REGION:-us-east-1}\" \"${RESOURCE_NAME:-}\" 2>&1 | tail -50",
             "async": true,
-            "statusMessage": "Running AWS Lambda investigation script..."
+            "statusMessage": "Running automated AWS service investigation..."
           }
         ]
       },
@@ -17,9 +17,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash skills/eks-troubleshooting/examples/investigate-deployment.sh ${DEPLOYMENT:-my-deployment} 2>/dev/null | tail -20 || echo 'EKS troubleshooting script executed'",
+            "command": "bash skills/eks-troubleshooting/run-investigation.sh \"${PROBLEM:-Kubernetes issue detected}\" \"${CONTEXT:-}\" \"${NAMESPACE:-default}\" \"${RESOURCE_NAME:-}\" 2>&1 | tail -50",
             "async": true,
-            "statusMessage": "Running EKS deployment investigation script..."
+            "statusMessage": "Running automated EKS/Kubernetes investigation..."
           }
         ]
       },
@@ -28,9 +28,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash skills/datadog-troubleshooting/examples/investigate-service.sh 2>/dev/null | tail -20 || echo 'Datadog troubleshooting script executed'",
+            "command": "bash skills/datadog-troubleshooting/run-investigation.sh \"${PROBLEM:-Datadog issue detected}\" \"${SERVICE_NAME:-}\" \"${ENVIRONMENT:-prod}\" \"${TIME_WINDOW:-60}\" 2>&1 | tail -50",
             "async": true,
-            "statusMessage": "Running Datadog service investigation script..."
+            "statusMessage": "Running automated Datadog investigation..."
           }
         ]
       }

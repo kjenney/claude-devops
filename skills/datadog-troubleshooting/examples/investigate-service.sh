@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 # Example: Investigate a service's health in Datadog
-# Usage: SERVICE=payment-api ENV=prod bash investigate-service.sh
+#
+# AUTOMATED: This script is automatically called by run-investigation.sh for service health investigations.
+# It can also be run directly for manual investigation.
+#
+# Usage: SERVICE=payment-api ENV=prod DD_API_KEY=xxx DD_APP_KEY=yyy bash investigate-service.sh
+# Example: SERVICE=payment-api ENV=prod MINUTES=120 bash investigate-service.sh
+#
+# Required environment variables:
+#   SERVICE: Service name (as tagged in Datadog)
+#   ENV: Environment name (default: prod)
+#   DD_API_KEY: Datadog API key
+#   DD_APP_KEY: Datadog application key
+#   MINUTES: Time window in minutes (default: 60)
 
 set -euo pipefail
 

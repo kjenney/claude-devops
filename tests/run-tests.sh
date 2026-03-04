@@ -55,10 +55,13 @@ if $RUN_LINT; then
     warn "Skipping lint phase."
   else
     SCRIPTS=(
+      "$PLUGIN_ROOT/skills/aws-troubleshooting/run-investigation.sh"
       "$PLUGIN_ROOT/skills/aws-troubleshooting/examples/investigate-rds.sh"
       "$PLUGIN_ROOT/skills/aws-troubleshooting/examples/investigate-lambda.sh"
+      "$PLUGIN_ROOT/skills/eks-troubleshooting/run-investigation.sh"
       "$PLUGIN_ROOT/skills/eks-troubleshooting/examples/investigate-deployment.sh"
       "$PLUGIN_ROOT/skills/eks-troubleshooting/examples/investigate-networking.sh"
+      "$PLUGIN_ROOT/skills/datadog-troubleshooting/run-investigation.sh"
       "$PLUGIN_ROOT/skills/datadog-troubleshooting/examples/investigate-service.sh"
     )
 
@@ -84,10 +87,13 @@ if $RUN_TESTS; then
     warn "Skipping test phase."
   else
     TEST_FILES=(
+      "$TESTS_DIR/aws/run-investigation.bats"
       "$TESTS_DIR/aws/investigate-rds.bats"
       "$TESTS_DIR/aws/investigate-lambda.bats"
+      "$TESTS_DIR/eks/run-investigation.bats"
       "$TESTS_DIR/eks/investigate-deployment.bats"
       "$TESTS_DIR/eks/investigate-networking.bats"
+      "$TESTS_DIR/datadog/run-investigation.bats"
       "$TESTS_DIR/datadog/investigate-service.bats"
     )
 

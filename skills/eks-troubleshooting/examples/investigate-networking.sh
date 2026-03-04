@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # Example: Investigate Kubernetes service connectivity issues
-# Usage: CONTEXT=prod-cluster NS=production bash investigate-networking.sh my-service
+#
+# AUTOMATED: This script is automatically called by run-investigation.sh when networking/service issues are detected.
+# It can also be run directly for manual investigation.
+#
+# Usage: CONTEXT=prod-cluster NS=production bash investigate-networking.sh <service-name>
+# Example: CONTEXT=prod-cluster NS=production bash investigate-networking.sh payment-api
 
 set -euo pipefail
 

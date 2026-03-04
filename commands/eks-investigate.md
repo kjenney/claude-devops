@@ -9,7 +9,7 @@ allowed-tools:
 
 # EKS Investigation
 
-The user wants to troubleshoot a Kubernetes or EKS issue. Conduct a systematic investigation using kubectl.
+The user wants to troubleshoot a Kubernetes or EKS issue. Conduct a systematic investigation using kubectl with automated issue detection.
 
 ## Step 1: Gather Information
 
@@ -22,26 +22,27 @@ Ask the user for the following (in one message):
 
 If the user provided an argument, use it as context for the problem description.
 
-## Step 2: Set Context
+## Step 2: Automatic Investigation
 
-Once context and namespace are known:
+Once context and namespace are known, run the automated investigation script which will:
+
+1. Verify kubectl access and context
+2. **Automatically detect** the issue type (deployment, networking, node, ingress) from the problem description
+3. Run the appropriate example investigation script if available
+4. Provide targeted diagnostics
 
 ```bash
-kubectl config use-context <context>
-export NS=<namespace>
+bash skills/eks-troubleshooting/run-investigation.sh "<problem>" "<context>" "<namespace>" "[resource-name]"
 ```
 
-Verify access:
-```bash
-kubectl cluster-info
-kubectl get nodes
-```
+**Supported automated investigations:**
+- **Deployment issues**: Pod crashes, CrashLoopBackOff, image pull errors, stuck rollouts
+- **Networking issues**: Service connectivity, DNS resolution, endpoints, network policies
+- Other issues: Manual commands guided by references/kubernetes-resources.md
 
-If access fails, report the error and help the user diagnose kubeconfig issues.
+## Step 3: Further Investigation (If Needed)
 
-## Step 3: Investigate
-
-Start with a broad view, then narrow down:
+If automated investigation isn't available or you need deeper analysis, start with a broad view, then narrow down:
 
 ### Always Start With:
 ```bash

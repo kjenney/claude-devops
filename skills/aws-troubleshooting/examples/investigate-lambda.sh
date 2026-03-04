@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # Example: Investigate Lambda function errors
-# Usage: AWS_PROFILE=prod AWS_DEFAULT_REGION=us-east-1 bash investigate-lambda.sh my-function-name
+#
+# AUTOMATED: This script is automatically called by run-investigation.sh when Lambda issues are detected.
+# It can also be run directly for manual investigation.
+#
+# Usage: AWS_PROFILE=prod AWS_DEFAULT_REGION=us-east-1 bash investigate-lambda.sh my-function-name [time-window-minutes]
+# Example: AWS_PROFILE=prod AWS_DEFAULT_REGION=us-east-1 bash investigate-lambda.sh payment-processor 30
 
 set -euo pipefail
 

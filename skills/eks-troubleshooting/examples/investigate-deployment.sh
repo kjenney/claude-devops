@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # Example: Investigate a Kubernetes deployment issue
-# Usage: CONTEXT=prod-cluster NS=production bash investigate-deployment.sh my-service
+#
+# AUTOMATED: This script is automatically called by run-investigation.sh when deployment/pod issues are detected.
+# It can also be run directly for manual investigation.
+#
+# Usage: CONTEXT=prod-cluster NS=production bash investigate-deployment.sh <deployment-name>
+# Example: CONTEXT=prod-cluster NS=production bash investigate-deployment.sh payment-service
 
 set -euo pipefail
 
