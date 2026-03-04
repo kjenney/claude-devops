@@ -51,13 +51,14 @@ Ask the user for:
 - Which **namespace** contains the affected resources
 - The **resource name** (deployment, pod, service, ingress, etc.)
 
-Then verify access:
+Then run the automated investigation:
 ```bash
-kubectl config use-context <context>
-export NS=<namespace>
-kubectl cluster-info
-kubectl get nodes
+bash skills/eks-troubleshooting/run-investigation.sh "<issue-type>" "<resource-name>" "<context>" "<namespace>"
 ```
+
+Where issue-type is one of: deployment, networking, node, ingress
+
+This script will run the appropriate investigation for the issue type.
 
 **Investigation Process:**
 

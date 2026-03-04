@@ -4,12 +4,15 @@
 # AUTOMATED: This script is automatically called by run-investigation.sh when RDS/database issues are detected.
 # It can also be run directly for manual investigation.
 #
-# Usage: AWS_PROFILE=prod AWS_DEFAULT_REGION=us-east-1 bash investigate-rds.sh <db-instance-id> [time-window-minutes]
-# Example: AWS_PROFILE=prod AWS_DEFAULT_REGION=us-east-1 bash investigate-rds.sh prod-db-instance 60
+# Usage: bash investigate-rds.sh <db-instance-id> [time-window-minutes] [region]
+# Example: bash investigate-rds.sh prod-db-instance 60 us-east-1
 
 set -euo pipefail
 
 DB_INSTANCE="${1:?Usage: $0 <db-instance-id>}"
+REGION="${2:-${AWS_DEFAULT_REGION:-us-east-1}}"
+
+export AWS_DEFAULT_REGION="$REGION"
 
 echo "=== RDS Instance Status ==="
 aws rds describe-db-instances \

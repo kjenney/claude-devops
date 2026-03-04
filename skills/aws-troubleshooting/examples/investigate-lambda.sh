@@ -4,13 +4,16 @@
 # AUTOMATED: This script is automatically called by run-investigation.sh when Lambda issues are detected.
 # It can also be run directly for manual investigation.
 #
-# Usage: AWS_PROFILE=prod AWS_DEFAULT_REGION=us-east-1 bash investigate-lambda.sh my-function-name [time-window-minutes]
-# Example: AWS_PROFILE=prod AWS_DEFAULT_REGION=us-east-1 bash investigate-lambda.sh payment-processor 30
+# Usage: bash investigate-lambda.sh <function-name> [time-window-minutes] [region]
+# Example: bash investigate-lambda.sh payment-processor 30 us-east-1
 
 set -euo pipefail
 
 FUNCTION_NAME="${1:?Usage: $0 <function-name>}"
 MINUTES="${2:-30}"
+REGION="${3:-${AWS_DEFAULT_REGION:-us-east-1}}"
+
+export AWS_DEFAULT_REGION="$REGION"
 
 START_TIME_MS=$(( $(date +%s) * 1000 - MINUTES * 60 * 1000 ))
 

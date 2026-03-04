@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
-# Automated EKS/Kubernetes investigation script that detects issue type and runs appropriate examples
-# Usage: bash run-investigation.sh "<problem-description>" "<context>" "<namespace>" "[resource-name]"
+# Automated EKS/Kubernetes investigation script that runs investigation for a specific issue type
+# Usage: bash run-investigation.sh "<issue-type>" "<resource-name>" "<context>" "<namespace>"
+# issue-type: deployment, networking, node, ingress
 
 set -euo pipefail
 
-PROBLEM="${1:-}"
-CONTEXT="${2:-}"
-NAMESPACE="${3:-default}"
-RESOURCE_NAME="${4:-}"
+ISSUE_TYPE="${1:-}"
+RESOURCE_NAME="${2:-}"
+CONTEXT="${3:-}"
+NAMESPACE="${4:-default}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 EXAMPLES_DIR="$SCRIPT_DIR/examples"
 
@@ -41,72 +42,37 @@ if ! kubectl cluster-info > /dev/null 2>&1; then
 fi
 echo -e "${GREEN}✓ kubectl access verified${NC}\n"
 
-# Detect issue type from problem description
-detect_issue_type() {
-  local problem="$1"
-  problem_lower=$(echo "$problem" | tr '[:upper:]' '[:lower:]')
-
-  if [[ "$problem_lower" =~ deployment|pod.*crash|crash.*loop|image.*pull|pending.*pod ]]; then
-    echo "deployment"
-  elif [[ "$problem_lower" =~ service|network|connect|endpoint|dns|latency ]]; then
-    echo "networking"
-  elif [[ "$problem_lower" =~ node|notready|resource|memory|cpu ]]; then
-    echo "node"
-  elif [[ "$problem_lower" =~ ingress|route|load.?balanc ]]; then
-    echo "ingress"
-  else
-    echo "generic"
-  fi
-}
+if [[ -z "$ISSUE_TYPE" ]]; then
+  echo -e "${RED}Error: Issue type required (deployment, networking, node, ingress)${NC}"
+  exit 1
+fi
 
 # Run issue-specific investigation
-run_investigation() {
-  local issue_type="$1"
-  local resource_name="$2"
-
-  case "$issue_type" in
-    deployment)
-      echo -e "${YELLOW}Detected deployment/pod issue${NC}"
-      if [[ -z "$resource_name" ]]; then
-        echo -e "${RED}Deployment name required. Please provide the deployment name.${NC}"
-        return 1
-      fi
-      echo -e "${YELLOW}Running deployment investigation for: $resource_name${NC}\n"
-      bash "$EXAMPLES_DIR/investigate-deployment.sh" "$resource_name"
-      ;;
-    networking)
-      echo -e "${YELLOW}Detected networking/service issue${NC}"
-      if [[ -z "$resource_name" ]]; then
-        echo -e "${RED}Service name required. Please provide the service name.${NC}"
-        return 1
-      fi
-      echo -e "${YELLOW}Running networking investigation for: $resource_name${NC}\n"
-      bash "$EXAMPLES_DIR/investigate-networking.sh" "$resource_name"
-      ;;
-    *)
-      echo -e "${YELLOW}Issue type: $issue_type (generic investigation)${NC}"
-      echo -e "${YELLOW}See references/kubernetes-resources.md for detailed kubectl commands${NC}"
-      return 1
-      ;;
-  esac
-}
-
-# Main execution
-ISSUE_TYPE=$(detect_issue_type "$PROBLEM")
-echo -e "${GREEN}Detected issue type: $ISSUE_TYPE${NC}"
-echo "Problem: $PROBLEM"
-echo "Context: $CONTEXT"
-echo "Namespace: $NAMESPACE"
-if [[ -n "$RESOURCE_NAME" ]]; then
-  echo "Resource: $RESOURCE_NAME"
-fi
-echo ""
-
-if run_investigation "$ISSUE_TYPE" "$RESOURCE_NAME"; then
-  echo -e "\n${GREEN}✓ Investigation complete${NC}"
-else
-  echo -e "\n${YELLOW}⚠ Issue-specific investigation not available${NC}"
-  echo "Please manually run investigation commands. Refer to:"
-  echo "  - SKILL.md for workflow guidance"
-  echo "  - references/kubernetes-resources.md for detailed kubectl commands"
-fi
+case "$ISSUE_TYPE" in
+  deployment)
+    echo -e "${YELLOW}Investigating deployment: $RESOURCE_NAME${NC}\n"
+    if [[ -z "$RESOURCE_NAME" ]]; then
+      echo -e "${RED}Error: Deployment name required${NC}"
+      exit 1
+    fi
+    bash "$EXAMPLES_DIR/investigate-deployment.sh" "$RESOURCE_NAME"
+    ;;
+  networking)
+    echo -e "${YELLOW}Investigating service: $RESOURCE_NAME${NC}\n"
+    if [[ -z "$RESOURCE_NAME" ]]; then
+      echo -e "${RED}Error: Service name required${NC}"
+      exit 1
+    fi
+    bash "$EXAMPLES_DIR/investigate-networking.sh" "$RESOURCE_NAME"
+    ;;
+  node|ingress)
+    echo -e "${YELLOW}Issue type: $ISSUE_TYPE${NC}"
+    echo -e "${YELLOW}Refer to SKILL.md and references/kubernetes-resources.md for $ISSUE_TYPE investigation commands${NC}"
+    exit 1
+    ;;
+  *)
+    echo -e "${RED}Error: Unknown issue type '$ISSUE_TYPE'${NC}"
+    echo "Supported types: deployment, networking, node, ingress"
+    exit 1
+    ;;
+esac

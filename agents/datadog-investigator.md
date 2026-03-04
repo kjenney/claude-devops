@@ -47,17 +47,19 @@ You are an expert Datadog SRE and observability engineer. You specialize in quer
 
 **Before Starting:**
 
-Verify credentials are set:
-```bash
-echo "DD_API_KEY: ${DD_API_KEY:+[SET]}${DD_API_KEY:-[NOT SET]}"
-echo "DD_APP_KEY: ${DD_APP_KEY:+[SET]}${DD_APP_KEY:-[NOT SET]}"
-```
+Ask the user for:
+- **Service name** to investigate (as tagged in Datadog)
+- **Environment** (e.g., prod, staging)
+- **Time window** for investigation (default: last 60 minutes)
 
-If not set, ask the user to export them:
+Then run the automated investigation:
 ```bash
 export DD_API_KEY="<api-key>"     # From: Datadog → Org Settings → API Keys
 export DD_APP_KEY="<app-key>"     # From: Datadog → Org Settings → Application Keys
+bash skills/datadog-troubleshooting/run-investigation.sh "<service-name>" "<environment>" "[time-window-minutes]"
 ```
+
+This script will automatically query monitors, logs, errors, and APM traces.
 
 Ask the user for:
 - **Service name** (the `service` tag value in Datadog)

@@ -6,9 +6,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash skills/aws-troubleshooting/run-investigation.sh \"${PROBLEM:-AWS issue detected}\" \"${AWS_PROFILE:-default}\" \"${AWS_DEFAULT_REGION:-us-east-1}\" \"${RESOURCE_NAME:-}\" 2>&1 | tail -50",
+            "command": "bash skills/audit-log.sh 'investigation_request' 'AWS investigation initiated' && bash skills/security-check.sh 'aws-investigator' 2>&1 | tail -20",
             "async": true,
-            "statusMessage": "Running automated AWS service investigation..."
+            "statusMessage": "🔍 Auditing investigation request..."
           }
         ]
       },
@@ -17,9 +17,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash skills/eks-troubleshooting/run-investigation.sh \"${PROBLEM:-Kubernetes issue detected}\" \"${CONTEXT:-}\" \"${NAMESPACE:-default}\" \"${RESOURCE_NAME:-}\" 2>&1 | tail -50",
+            "command": "bash skills/audit-log.sh 'investigation_request' 'EKS investigation initiated' && bash skills/security-check.sh 'eks-investigator' 2>&1 | tail -20",
             "async": true,
-            "statusMessage": "Running automated EKS/Kubernetes investigation..."
+            "statusMessage": "🔍 Auditing investigation request..."
           }
         ]
       },
@@ -28,9 +28,20 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash skills/datadog-troubleshooting/run-investigation.sh \"${PROBLEM:-Datadog issue detected}\" \"${SERVICE_NAME:-}\" \"${ENVIRONMENT:-prod}\" \"${TIME_WINDOW:-60}\" 2>&1 | tail -50",
+            "command": "bash skills/audit-log.sh 'investigation_request' 'Datadog investigation initiated' && bash skills/security-check.sh 'datadog-investigator' 2>&1 | tail -20",
             "async": true,
-            "statusMessage": "Running automated Datadog investigation..."
+            "statusMessage": "🔍 Auditing investigation request..."
+          }
+        ]
+      },
+      {
+        "matcher": "Agent.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash skills/security-check.sh 'AWS or K8s command detected' 2>&1 | grep -E 'SENSITIVE|PRODUCTION' || true",
+            "async": true,
+            "statusMessage": "🔒 Checking for sensitive operations..."
           }
         ]
       }
