@@ -12,12 +12,40 @@ The user wants to investigate service health using Datadog with automated invest
 
 Launch the Datadog investigator agent to handle the investigation. The agent will:
 1. Verify Datadog API credentials
-2. Gather information about the problem (service name, environment, time window)
+2. Ask for the service name and environment to investigate
 3. Query monitors, logs, errors, and APM traces
 4. Analyze service health and identify anomalies
 5. Provide findings and recommendations
 
-Use the Agent tool to launch the datadog-investigator agent with the user's service name or problem description.
+Use the Agent tool to launch the datadog-investigator agent with the user's service name or investigation request.
+
+## How It Works
+
+The agent will guide you through the investigation process using this script:
+
+```bash
+bash skills/datadog-troubleshooting/run-investigation.sh "<service-name>" "<environment>" "[time-window-minutes]"
+```
+
+**Parameters:**
+- `service-name`: The `service` tag value in Datadog (e.g., `payment-api`, `user-service`)
+- `environment`: The `env` tag value (e.g., `prod`, `staging`; defaults to `prod`)
+- `time-window-minutes`: How many minutes back to investigate (defaults to `60`)
+
+**What the script does:**
+1. Verifies Datadog API credentials (DD_API_KEY and DD_APP_KEY)
+2. Queries Datadog for service health using monitors, logs, metrics, and APM traces
+3. Provides a comprehensive summary of:
+   - Triggered monitors and alert status
+   - Recent error logs with patterns
+   - Error rate and latency metrics
+   - Key performance indicators
+   - Links to the Datadog UI for deeper investigation
+
+**Required environment variables:**
+- `DD_API_KEY`: Your Datadog API key (get from Organization Settings → API Keys)
+- `DD_APP_KEY`: Your Datadog application key (get from Organization Settings → Application Keys)
+- `DD_SITE`: Datadog site (optional; defaults to `datadoghq.com`, use `datadoghq.eu` for EU)
 
 ## Step 1: Verify Credentials
 
@@ -44,23 +72,22 @@ export DD_SITE="${DD_SITE:-datadoghq.com}"
 Ask the user (all in one message):
 
 1. **Service name**: The `service` tag value in Datadog (e.g., `payment-api`, `user-service`)
-2. **Environment**: The `env` tag (e.g., `prod`, `staging`)
-3. **Time window**: How far back to look (default: last 60 minutes)
-4. **What is the problem?**: Description of the issue to investigate
+2. **Environment**: The `env` tag (e.g., `prod`, `staging`; default: `prod`)
+3. **Time window**: How far back to look in minutes (default: last 60 minutes)
 
-If the user provided an argument, use it as the service name or problem description.
+If the user provided an argument, use it as the service name.
 
 ## Step 3: Automatic Investigation
 
 Once credentials and parameters are confirmed, run the automated investigation script which will:
 
 1. Verify Datadog API access
-2. **Automatically run** the comprehensive service investigation
+2. Run the comprehensive service investigation
 3. Query monitors, logs, errors, and APM traces
 4. Provide health summary with relevant context
 
 ```bash
-bash skills/datadog-troubleshooting/run-investigation.sh "<problem>" "<service-name>" "<environment>" "[time-window-minutes]"
+bash skills/datadog-troubleshooting/run-investigation.sh "<service-name>" "<environment>" "[time-window-minutes]"
 ```
 
 This script automatically:

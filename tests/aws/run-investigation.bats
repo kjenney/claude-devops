@@ -15,36 +15,35 @@ setup() {
   [ -x "$SCRIPT" ]
 }
 
-@test "requires problem description argument" {
+@test "requires service type argument" {
   run bash "$SCRIPT"
   [ "$status" -ne 0 ]
 }
 
-@test "requires AWS_PROFILE and AWS_DEFAULT_REGION" {
-  unset AWS_PROFILE
-  unset AWS_DEFAULT_REGION
-  run bash "$SCRIPT" "Lambda issue" "" "us-east-1"
+@test "requires profile and region arguments" {
+  run bash "$SCRIPT" "lambda" "my-function"
   [ "$status" -ne 0 ]
+  [[ "$output" == *"Profile"* ]] || [[ "$output" == *"region"* ]]
 }
 
-@test "executes for Lambda problem" {
-  run bash "$SCRIPT" "My Lambda function is timing out" "default" "us-east-1" "my-function" 2>&1
-  # Script should output something (either success or AWS error is fine)
+@test "executes for Lambda service type" {
+  run bash "$SCRIPT" "lambda" "my-function" "test" "us-east-1" 2>&1
+  # Script should output something (success or AWS error is acceptable)
   [ -n "$output" ]
 }
 
-@test "executes for RDS problem" {
-  run bash "$SCRIPT" "My database is running out of storage" "default" "us-east-1" "my-db" 2>&1
+@test "executes for RDS service type" {
+  run bash "$SCRIPT" "rds" "my-db" "test" "us-east-1" 2>&1
   [ -n "$output" ]
 }
 
-@test "executes for EC2 problem" {
-  run bash "$SCRIPT" "EC2 instance is not responding" "default" "us-east-1" "i-12345" 2>&1
+@test "executes for EC2 service type" {
+  run bash "$SCRIPT" "ec2" "i-12345" "test" "us-east-1" 2>&1
   [ -n "$output" ]
 }
 
 @test "includes AWS verification step" {
-  run bash "$SCRIPT" "Lambda issue" "default" "us-east-1" "my-function" 2>&1
-  # Should mention verifying AWS access or be successful
-  [[ "$output" =~ "Verifying" ]] || [[ "$output" =~ "verified" ]] || [[ "$output" =~ "Problem" ]]
+  run bash "$SCRIPT" "lambda" "my-function" "test" "us-east-1" 2>&1
+  # Should mention verifying AWS access
+  [[ "$output" == *"Verifying"* ]] || [[ "$output" == *"verified"* ]]
 }

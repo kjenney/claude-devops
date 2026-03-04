@@ -14,58 +14,58 @@ setup() {
   [ -x "$SCRIPT" ]
 }
 
-@test "requires problem description argument" {
+@test "requires service name argument" {
   run bash "$SCRIPT"
   [ "$status" -ne 0 ]
 }
 
 @test "requires DD_API_KEY environment variable" {
   unset DD_API_KEY
-  run bash "$SCRIPT" "Service error" "payment-api" "prod"
+  run bash "$SCRIPT" "payment-api" "prod"
   [ "$status" -ne 0 ]
   [[ "$output" == *"DD_API_KEY"* ]]
 }
 
 @test "requires DD_APP_KEY environment variable" {
   unset DD_APP_KEY
-  run bash "$SCRIPT" "Service error" "payment-api" "prod"
+  run bash "$SCRIPT" "payment-api" "prod"
   [ "$status" -ne 0 ]
   [[ "$output" == *"DD_APP_KEY"* ]]
 }
 
-@test "requires service name argument" {
-  run bash "$SCRIPT" "Service error" "" "prod"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *"Service name"* ]]
-}
-
-@test "detects service investigation type" {
-  run bash "$SCRIPT" "Payment API errors spiking" "payment-api" "prod" 2>&1
-  [[ "$output" == *"service"* ]] || [[ "$output" == *"Service"* ]]
+@test "accepts explicit service name" {
+  run bash "$SCRIPT" "payment-api" "prod" 2>&1
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"payment-api"* ]]
 }
 
 @test "uses default environment when not specified" {
-  run bash "$SCRIPT" "Service error" "payment-api" 2>&1
-  [[ "$output" == *"prod"* ]] || [[ "$output" == *"Environment"* ]]
+  run bash "$SCRIPT" "payment-api" 2>&1
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"prod"* ]]
 }
 
 @test "uses default time window when not specified" {
-  run bash "$SCRIPT" "Service error" "payment-api" "prod" 2>&1
-  [[ "$output" == *"60"* ]] || [[ "$output" == *"time window"* ]]
+  run bash "$SCRIPT" "payment-api" "prod" 2>&1
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"60"* ]]
 }
 
 @test "accepts custom time window in minutes" {
-  run bash "$SCRIPT" "Service error" "payment-api" "prod" "120" 2>&1
+  run bash "$SCRIPT" "payment-api" "prod" "120" 2>&1
+  [ "$status" -eq 0 ]
   [[ "$output" == *"120"* ]]
 }
 
 @test "accepts custom Datadog site" {
-  DD_SITE="datadoghq.eu" run bash "$SCRIPT" "Service error" "payment-api" "prod" 2>&1
-  [[ "$output" == *"datadoghq.eu"* ]] || [[ "$output" == *"app.datadoghq.eu"* ]]
+  DD_SITE="datadoghq.eu" run bash "$SCRIPT" "payment-api" "prod" 2>&1
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"datadoghq.eu"* ]]
 }
 
 @test "sets SERVICE environment variable for example script" {
-  run bash "$SCRIPT" "Service error" "payment-api" "prod" 2>&1
+  run bash "$SCRIPT" "payment-api" "prod" 2>&1
+  [ "$status" -eq 0 ]
   # The script should pass SERVICE to the example
   [[ "$output" == *"payment-api"* ]]
 }

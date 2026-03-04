@@ -8,16 +8,42 @@ allowed-tools:
 
 # EKS Investigation
 
-The user wants to troubleshoot a Kubernetes or EKS issue with automated issue detection.
+The user wants to troubleshoot a Kubernetes or EKS issue using automated investigation.
 
 Launch the EKS investigator agent to handle the investigation. The agent will:
-1. Gather information about the problem (issue type, context, namespace, resource)
-2. Verify kubectl access and context
-3. Automatically detect the issue type (deployment, networking, nodes, etc.)
-4. Run appropriate investigation scripts
+1. Ask for the issue type (deployment, networking, node, ingress)
+2. Gather resource details and kubectl context information
+3. Verify kubectl access and context
+4. Run the appropriate investigation script for that issue type
 5. Provide findings and recommendations
 
 Use the Agent tool to launch the eks-investigator agent with the user's issue description.
+
+## How It Works
+
+The agent will guide you through the investigation process using this script:
+
+```bash
+bash skills/eks-troubleshooting/run-investigation.sh "<issue-type>" "<resource-name>" "<context>" "<namespace>"
+```
+
+**Parameters:**
+- `issue-type`: One of: `deployment`, `networking`, `node`, `ingress`
+- `resource-name`: The specific resource to investigate (deployment name, service name, node name, etc.)
+- `context`: kubectl context to use (or will use current context if not specified)
+- `namespace`: Kubernetes namespace (defaults to `default` if not specified)
+
+**What the script does:**
+1. Validates the issue type and context
+2. Verifies kubectl access and switches to the specified context
+3. Calls the appropriate example investigation script for that issue type
+4. Provides diagnostic output for your problem
+
+**Supported issue types and what they investigate:**
+- **deployment**: Pod status, rollout status, events, restart counts, resource usage
+- **networking**: Service details, endpoints, DNS resolution, network policies
+- **node**: Node status, conditions, resource pressure, taints/tolerations
+- **ingress**: Ingress configuration, backend services, certificate status
 
 ## Step 1: Gather Information
 
@@ -35,18 +61,19 @@ If the user provided an argument, use it as context for the problem description.
 Once context and namespace are known, run the automated investigation script which will:
 
 1. Verify kubectl access and context
-2. **Automatically detect** the issue type (deployment, networking, node, ingress) from the problem description
-3. Run the appropriate example investigation script if available
-4. Provide targeted diagnostics
+2. Run the appropriate example investigation script for the issue type
+3. Provide targeted diagnostics
 
 ```bash
-bash skills/eks-troubleshooting/run-investigation.sh "<problem>" "<context>" "<namespace>" "[resource-name]"
+bash skills/eks-troubleshooting/run-investigation.sh "<issue-type>" "<resource-name>" "<context>" "<namespace>"
 ```
 
-**Supported automated investigations:**
-- **Deployment issues**: Pod crashes, CrashLoopBackOff, image pull errors, stuck rollouts
-- **Networking issues**: Service connectivity, DNS resolution, endpoints, network policies
-- Other issues: Manual commands guided by references/kubernetes-resources.md
+**Supported issue types:**
+- `deployment` - Pod crashes, CrashLoopBackOff, image pull errors, stuck rollouts
+- `networking` - Service connectivity, DNS resolution, endpoints, network policies
+- `node` - NotReady nodes, resource pressure, capacity issues
+- `ingress` - Routing issues, certificate problems
+
 
 ## Step 3: Further Investigation (If Needed)
 
