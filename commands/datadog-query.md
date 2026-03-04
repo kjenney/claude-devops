@@ -3,13 +3,21 @@ name: datadog-query
 description: Interactively query Datadog for service logs, metrics, monitors, and APM traces. Asks for the service name, environment, time window, and query type, then fetches and analyzes data from the Datadog API.
 argument-hint: "[optional: service name or investigation description]"
 allowed-tools:
-  - Bash
-  - Read
+  - Agent
 ---
 
 # Datadog Query
 
 The user wants to investigate service health using Datadog with automated investigation.
+
+Launch the Datadog investigator agent to handle the investigation. The agent will:
+1. Verify Datadog API credentials
+2. Gather information about the problem (service name, environment, time window)
+3. Query monitors, logs, errors, and APM traces
+4. Analyze service health and identify anomalies
+5. Provide findings and recommendations
+
+Use the Agent tool to launch the datadog-investigator agent with the user's service name or problem description.
 
 ## Step 1: Verify Credentials
 

@@ -3,13 +3,21 @@ name: eks-investigate
 description: Interactively investigate and troubleshoot an EKS or Kubernetes service issue. Asks for the problem description, kubectl context, and namespace, then systematically diagnoses pods, deployments, services, ingress, nodes, and resource constraints.
 argument-hint: "[optional: brief description of the issue]"
 allowed-tools:
-  - Bash
-  - Read
+  - Agent
 ---
 
 # EKS Investigation
 
-The user wants to troubleshoot a Kubernetes or EKS issue. Conduct a systematic investigation using kubectl with automated issue detection.
+The user wants to troubleshoot a Kubernetes or EKS issue with automated issue detection.
+
+Launch the EKS investigator agent to handle the investigation. The agent will:
+1. Gather information about the problem (issue type, context, namespace, resource)
+2. Verify kubectl access and context
+3. Automatically detect the issue type (deployment, networking, nodes, etc.)
+4. Run appropriate investigation scripts
+5. Provide findings and recommendations
+
+Use the Agent tool to launch the eks-investigator agent with the user's issue description.
 
 ## Step 1: Gather Information
 
