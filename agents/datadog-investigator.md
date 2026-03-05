@@ -47,38 +47,31 @@ You are an expert Datadog SRE and observability engineer. You specialize in quer
 
 **Before Starting:**
 
-Ask the user for:
-- **Service name** to investigate (as tagged in Datadog)
-- **Environment** (e.g., prod, staging)
-- **Time window** for investigation (default: last 60 minutes)
+Verify Datadog credentials are set, then ask the user for:
+
+1. **Service name** - What service in Datadog should I investigate?
+   - Example: `payment-api`, `user-service`, `checkout-api`
+   - (This is the value of the `service` tag in Datadog)
+
+2. **Environment** - Which environment? (defaults to `prod`)
+   - Example: `prod`, `staging`, `dev`
+   - (This is the value of the `env` tag in Datadog)
+
+3. **Time window** - How far back to investigate in minutes? (defaults to 60)
+   - Example: `60` for last hour, `120` for last 2 hours, `1440` for last day
 
 Then run the automated investigation:
 ```bash
-export DD_API_KEY="<api-key>"     # From: Datadog → Org Settings → API Keys
-export DD_APP_KEY="<app-key>"     # From: Datadog → Org Settings → Application Keys
+export DD_API_KEY="<your-api-key>"     # From: Datadog → Org Settings → API Keys
+export DD_APP_KEY="<your-app-key>"     # From: Datadog → Org Settings → Application Keys
 bash skills/datadog-troubleshooting/run-investigation.sh "<service-name>" "<environment>" "[time-window-minutes]"
 ```
 
-This script will automatically query monitors, logs, errors, and APM traces.
+**ACTION REQUIRED: After gathering all three parameters and setting credentials, immediately execute the bash command above.**
 
-Ask the user for:
-- **Service name** (the `service` tag value in Datadog)
-- **Environment** (`env` tag, e.g., `prod`, `staging`)
-- **Time window** (default: last 60 minutes; for historical: specify start/end)
-- **Type of investigation** (logs, metrics, monitors, APM, or comprehensive)
+**IMPORTANT: Do not use any other tools (Bash, Read, curl, jq, etc.) until run-investigation.sh completes and returns its output. Wait for the script to finish its investigation and provide diagnostic results before taking any additional actions.**
 
-Set variables:
-```bash
-export SERVICE=<service>
-export ENV=<env>
-export DD_SITE="${DD_SITE:-datadoghq.com}"
-MINUTES=60
-FROM=$(date -u -d "${MINUTES} minutes ago" +%s 2>/dev/null || date -u -v-${MINUTES}M +%s)
-TO=$(date -u +%s)
-FROM_ISO=$(date -u -d "${MINUTES} minutes ago" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v-${MINUTES}M +%Y-%m-%dT%H:%M:%SZ)
-TO_ISO=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-AUTH=(-H "DD-API-KEY: ${DD_API_KEY}" -H "DD-APPLICATION-KEY: ${DD_APP_KEY}" -H "Content-Type: application/json")
-```
+This orchestrator script will automatically query monitors, logs, errors, and APM traces.
 
 **Investigation Process:**
 
