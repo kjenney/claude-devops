@@ -16,5 +16,6 @@ The agent will ask for:
 
 Then run:
 ```bash
-bash skills/eks-troubleshooting/run-investigation.sh "<issue-type>" "<resource-name>" "<context>" "<namespace>"
+PLUGIN_DIR="$(dirname "$(find ~ -name ".claude-plugin" -type d 2>/dev/null | grep devops-claude-plugin)" 2>/dev/null)" && \
+bash "$PLUGIN_DIR/skills/eks-troubleshooting/run-investigation.sh" "<issue-type>" "<resource-name>" "<context>" "<namespace>"
 ```

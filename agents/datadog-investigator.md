@@ -20,7 +20,8 @@ export DD_APP_KEY="<your-app-key>"
 
 Then execute:
 ```bash
-bash skills/datadog-troubleshooting/run-investigation.sh "<service-name>" "<environment>" "[time-window-minutes]"
+PLUGIN_DIR="$(dirname "$(find ~ -name ".claude-plugin" -type d 2>/dev/null | grep devops-claude-plugin)" 2>/dev/null)" && \
+bash "$PLUGIN_DIR/skills/datadog-troubleshooting/run-investigation.sh" "<service-name>" "<environment>" "[time-window-minutes]"
 ```
 
 Wait for the script to complete before performing any other actions.

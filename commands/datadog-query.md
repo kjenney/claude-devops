@@ -15,7 +15,8 @@ The agent will ask for:
 
 Then run:
 ```bash
-bash skills/datadog-troubleshooting/run-investigation.sh "<service-name>" "<environment>" "[time-window-minutes]"
+PLUGIN_DIR="$(dirname "$(find ~ -name ".claude-plugin" -type d 2>/dev/null | grep devops-claude-plugin)" 2>/dev/null)" && \
+bash "$PLUGIN_DIR/skills/datadog-troubleshooting/run-investigation.sh" "<service-name>" "<environment>" "[time-window-minutes]"
 ```
 
 Note: Requires DD_API_KEY and DD_APP_KEY environment variables set.
