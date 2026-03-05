@@ -1,112 +1,31 @@
 ---
 name: EKS Troubleshooting
-description: This skill should be used when the user asks to "troubleshoot EKS", "investigate Kubernetes service", "debug pod crash", "check pod logs", "pod is OOMKilled", "deployment is stuck", "service not reachable", "node is NotReady", "ingress not routing", "HPA not scaling", "check namespace quotas", "debug kubectl", or mentions Kubernetes resource errors, CrashLoopBackOff, ImagePullBackOff, Pending pods, or EKS cluster issues. Provides systematic Kubernetes investigation workflows using kubectl.
+description: Investigate Kubernetes/EKS issues by running run-investigation.sh with the issue type, resource name, kubectl context, and namespace.
 ---
 
-# EKS Troubleshooting
+# EKS Troubleshooting Skill
 
-A structured approach to diagnosing and resolving issues in Amazon EKS clusters using kubectl. Covers workloads (pods, deployments), networking (services, ingress, DNS), nodes and scaling (HPA, cluster autoscaler), and resource management (quotas, limits).
-
-## Prerequisites
-
-Ensure the following are available:
-- `kubectl` installed and working
-- Access to the relevant cluster context (`kubectl config get-contexts`)
-- Appropriate RBAC permissions for the namespaces being investigated
-
-## Core Workflow
-
-### 1. Update kubeconfig
-
-Always update kubeconfig before querying Kubernetes clusters:
+The `/eks-investigate` command and `eks-investigator` agent run the automated investigation orchestrator:
 
 ```bash
-aws eks update-kubeconfig --name <cluster-name> --region <region>
+bash skills/eks-troubleshooting/run-investigation.sh "<issue-type>" "<resource-name>" "<context>" "<namespace>"
 ```
 
-### 2. Gather Context
+## Supported Issue Types
 
-Collect before running commands:
-- **What is broken**: Symptom or error message
-- **Which cluster**: EKS cluster name and context
-- **Which namespace**: Kubernetes namespace of the affected resources
-- **Which resource**: Deployment, service, pod, ingress name
+- `deployment` - Pod status, rollout status, events, restart counts, resource usage
+- `networking` - Service details, endpoints, DNS resolution, network policies
+- `node` - Node status, conditions, resource pressure, taints/tolerations
+- `ingress` - Ingress configuration, backend services, certificate status
 
-Ask the user: "Which kubectl context and namespace should I use?" then set:
+## Usage
 
-```bash
-kubectl config use-context <context-name>
-export NS=<namespace>
-```
+1. Run `/eks-investigate` command
+2. Agent asks for issue type, resource name, kubectl context, and namespace
+3. Agent executes the investigation script
+4. Wait for results
 
-### 3. Verify Cluster Access
+## Example Scripts
 
-```bash
-kubectl cluster-info
-kubectl config current-context
-kubectl get nodes -o wide
-```
-
-### 4. Check Pod Status Across All Namespaces
-
-Always check pod status across all namespaces before troubleshooting:
-
-```bash
-kubectl get pods --all-namespaces -o wide
-```
-
-### 5. Investigate by Resource Type
-
-Use the patterns in `references/kubernetes-resources.md` based on what is broken.
-
-### 6. Systematic Pod Investigation
-
-For any pod issue, run this sequence:
-
-```bash
-# Step 1: Check pod status
-kubectl get pods -n $NS -o wide
-
-# Step 2: Describe the problematic pod
-kubectl describe pod <pod-name> -n $NS
-
-# Step 3: Get current logs
-kubectl logs <pod-name> -n $NS --tail=100
-
-# Step 4: Get previous container logs (if pod restarted)
-kubectl logs <pod-name> -n $NS --previous --tail=100
-
-# Step 5: Check events in namespace
-kubectl get events -n $NS --sort-by='.lastTimestamp' | tail -30
-```
-
-### 7. Common Pod Status Meanings
-
-| Status | Meaning | First Action |
-|--------|---------|-------------|
-| `CrashLoopBackOff` | Container exits repeatedly | Check logs with `--previous` |
-| `OOMKilled` | Memory limit exceeded | Increase `resources.limits.memory` |
-| `ImagePullBackOff` | Cannot pull container image | Use as signal for credential/registry issues - check image name, tag, registry credentials, and ECR access |
-| `Pending` | Cannot be scheduled | Check node capacity, taints, resource requests |
-| `Terminating` | Stuck during deletion | Check for finalizers |
-| `Error` | Container exited with error | Check exit code in `describe`, check logs |
-| `Init:Error` | Init container failed | Check init container logs |
-
-### 6. Summarize Findings
-
-After gathering data:
-1. Identify the root cause (resource exhaustion, image issue, config error, networking, scheduling)
-2. Propose remediation with specific kubectl commands
-3. Flag destructive operations (delete pod, scale down) for user confirmation
-
-## Additional Resources
-
-### Reference Files
-
-- **`references/kubernetes-resources.md`** - Detailed kubectl commands for deployments, services, ingress, nodes, HPA, quotas, RBAC
-- **`references/networking-debug.md`** - Service connectivity, DNS, and ingress debugging
-
-### Examples
-
-- **`examples/investigate-deployment.sh`** - Full deployment investigation script
-- **`examples/investigate-networking.sh`** - Service and ingress connectivity checks
+- `examples/investigate-deployment.sh` - Queries deployment status, events, pod logs
+- `examples/investigate-networking.sh` - Queries service endpoints, DNS, network policies
